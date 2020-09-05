@@ -3,11 +3,13 @@ import { promises } from "fs";
 
 import { scan } from "./iwlist";
 import { WifiError } from "./error";
-import { Scan } from "./types";
+import { Wifi } from "./types";
 import {
   NETWORK_SUPPLICANT_REGEX,
   NETWORK_UNENCRYPTED_PASSPHRASE_REGEX,
   NETWORK_EXISTS_REGEX,
+  ALL_NETWORKS_SUPPLICANT_REGEX,
+  NETWORK_SSID,
 } from "./regex";
 
 const supplicant_path = "/etc/wpa_supplicant/wpa_supplicant.conf";
@@ -71,7 +73,7 @@ const write_supplicant = async (
  */
 const find_network_in_scan = async (
   ssid: string
-): Promise<Scan | undefined> => {
+): Promise<Wifi | undefined> => {
   const available_networks = await scan();
 
   return available_networks.find(
@@ -80,8 +82,27 @@ const find_network_in_scan = async (
 };
 
 /**
+ * Find all networks listed in supplicant
+ * returns networks string or null
+ */
+const find_all_networks_in_supplicant = (file: string): string[] => {
+  const matchArr = file.match(ALL_NETWORKS_SUPPLICANT_REGEX);
+
+  if (!matchArr) {
+    return [];
+  }
+
+  return matchArr
+    .map((network) => {
+      const ssid = network.match(NETWORK_SSID);
+      return ssid ? ssid[1] : "";
+    })
+    .filter((network) => network);
+};
+
+/**
  * Find network listed in supplicant by SSID
- * returns netowrk object or null
+ * returns network string or null
  */
 const find_network_in_supplicant = (
   file: string,
@@ -124,6 +145,14 @@ const update_supplicant_file_content = (
       "failed to update wpa_supplicant.conf content"
     );
   }
+};
+
+/**
+ * Find all networks (displayed by ssid) listed in wpa_supplicant.conf
+ */
+export const find = async (): Promise<string[]> => {
+  const supplicant_file = await read_supplicant(supplicant_path);
+  return find_all_networks_in_supplicant(supplicant_file);
 };
 
 /**

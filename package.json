@@ -1,14 +1,14 @@
 {
-  "name": "@pi-methods/wifi",
+  "name": "@pi-methods/network",
   "version": "1.0.0",
-  "description": "Raspberry Pi 3 wifi utility functions",
+  "description": "Raspberry Pi 3 network utility functions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "tilersmyth",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tilersmyth/pi-methods-wifi"
+    "url": "https://github.com/tilersmyth/pi-methods-network"
   },
   "scripts": {
     "build": "rimraf dist && tsc"
