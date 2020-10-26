@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { promises } from "fs";
+import { readFile, writeFile } from "fs";
 
 import { scan } from "./iwlist";
 import { WifiError } from "./error";
@@ -38,16 +38,32 @@ const wpa_supplicant = (ssid: string, password: string): Promise<string> =>
     )
   );
 
+const readFileAsync = (file_path: string): Promise<string> => {
+  return new Promise((resolve, reject) =>
+    readFile(file_path, "utf-8", (err, data) =>
+      err ? reject(err) : resolve(data)
+    )
+  );
+};
+
 /**
  * Read supplicant.conf file
  */
 const read_supplicant = async (file_path: string): Promise<string> => {
   try {
-    const file = await promises.readFile(file_path, "utf-8");
+    const file = await readFileAsync(file_path);
     return file;
   } catch (err) {
     throw new WifiError("supplicant", "failed to read supplicant.conf file");
   }
+};
+
+const writeFileAsync = (file_path: string, data: string): Promise<void> => {
+  return new Promise((resolve, reject) =>
+    writeFile(file_path, data, "utf-8", (err) =>
+      err ? reject(err) : resolve()
+    )
+  );
 };
 
 /**
@@ -58,7 +74,7 @@ const write_supplicant = async (
   data: string
 ): Promise<void> => {
   try {
-    await promises.writeFile(file_path, data, "utf-8");
+    await writeFileAsync(file_path, data);
   } catch (err) {
     throw new WifiError(
       "supplicant",
@@ -161,6 +177,10 @@ export const find = async (): Promise<string[]> => {
 export const enable = async (ssid: string, password: string): Promise<void> => {
   if (!ssid || !password) {
     throw new WifiError("supplicant", "ssid and password required");
+  }
+
+  if (password.length < 8 || password.length > 63) {
+    throw new WifiError("supplicant", "Passphrase must be 8..63 characters");
   }
 
   const supplicant_file = await read_supplicant(supplicant_path);

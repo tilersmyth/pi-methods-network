@@ -48,3 +48,11 @@ export const NETWORK_SSID = new RegExp('ssids*=s*"([^"]+)"');
  */
 export const NETWORK_INTERFACE_STATE = (int: "wlan0" | "eth0") =>
   new RegExp(`${int}.*state\\s+([^\\s]+)`);
+
+/**
+ * Extracts inet address for ethernet (eth0) and wifi (wlan0)
+ * ${int}[^]*inet - get 'inet' immediately following specified interface including line breaks
+ * \\s+([^(/|\\s)]+) - after space get contents until forward slash or space
+ */
+export const NETWORK_INTERFACE_ADDR = (int: "wlan0" | "eth0") =>
+  new RegExp(`${int}[^]*inet\\s+([^(/|\\s)]+)`);

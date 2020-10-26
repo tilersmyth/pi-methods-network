@@ -10,7 +10,9 @@ sudo npm run start
 
 ### Iproute2
 
-#### Iproute2.state - indicates 'UP' or 'DOWN' state for ethernet (eth0) and wifi (wlan0)
+#### Iproute2.state - indicates 'UP' or 'DOWN' state based on interface (eth0 | wlan0)
+
+#### Iproute2.addr - returns IP address based on interface (eth0 | wlan0) or NULL if not connected
 
 <br />
 
@@ -33,5 +35,9 @@ sudo npm run start
 #### Supplicant.enable - add network to wpa_supplicant.conf
 
 #### Supplicant.disable - remove network from wpa_supplicant.conf
+
+### WPA CLI
+
+#### WpaCli.reconfigure - Reconfigure the wlan0 interface
 
 <br />
